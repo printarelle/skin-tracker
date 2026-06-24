@@ -10,44 +10,45 @@ const C = {
 
 // ── ROUTINE DATA ─────────────────────────────────────────────
 const AM = [
-  { id:'a1', emoji:'🧴', name:'Senka Perfect Whip Cleanser',  tip:'Wet face, massage 30 sec, rinse with lukewarm water.' },
-  { id:'a2', emoji:'🍊', name:'Melano CC Vitamin C Lotion',   tip:'Pour on palm, pat gently into skin. Do not rub.' },
-  { id:'a3', emoji:'💧', name:'Niacinamide 10% + Zinc',       tip:'Few drops across face and neck. Wait 1 min before next.' },
-  { id:'a4', emoji:'✨', name:'Matrixyl 10% + HA Peptide',    tip:'Few drops on top. Pat gently, do not rub.' },
+  { id:'a1', emoji:'🧴', name:'Senka Perfect Whip (blue)',   tip:'Wet face, massage 30 sec, rinse with lukewarm water.' },
+  { id:'a2', emoji:'🍊', name:'Melano CC Vitamin C Lotion',  tip:'Pour on palm, pat gently into skin. Do not rub.' },
+  { id:'a3', emoji:'💧', name:'Niacinamide 10% + Zinc',      tip:'Few drops across face and neck. Wait 1 min before next.' },
+  { id:'a4', emoji:'✨', name:'Matrixyl 10% + HA Peptide',   tip:'Few drops on top. Pat gently, do not rub.' },
 ]
 const PM_NORMAL = [
-  { id:'p1', emoji:'🧴', name:'Senka Perfect Whip Cleanser',  tip:'Remove the day. Massage gently, rinse well.' },
-  { id:'p2', emoji:'✨', name:'Matrixyl 10% + HA Peptide',    tip:'Few drops on clean dry skin. Pat gently.' },
-  { id:'p3', emoji:'💧', name:'Niacinamide 10% + Zinc',       tip:'After peptide absorbs. Few drops full face.' },
-  { id:'p4', emoji:'👁️', name:'Caffeine Solution 5%',         tip:'Dab gently around eye area only. Do not rub.' },
-  { id:'p5', emoji:'🌿', name:'SANA Soy Milk Eye Cream',      tip:'Tiny amount around eyes. Pat with ring finger.' },
+  { id:'p1', emoji:'🧴', name:'Senka Perfect Whip (blue)',   tip:'Remove the day. Massage gently, rinse well.' },
+  { id:'p2', emoji:'✨', name:'Matrixyl 10% + HA Peptide',   tip:'Few drops on clean dry skin. Pat gently.' },
+  { id:'p3', emoji:'💧', name:'Niacinamide 10% + Zinc',      tip:'After peptide absorbs. Few drops full face.' },
+  { id:'p4', emoji:'👁️', name:'Caffeine Solution 5%',        tip:'Dab gently around eye area only. Do not rub.' },
+  { id:'p5', emoji:'🌿', name:'SANA Soy Milk Eye Cream',     tip:'Tiny amount around eyes. Pat with ring finger.' },
 ]
 const PM_RETINOL = [
-  ...PM_NORMAL,
-  { id:'p6', emoji:'🔮', name:'Retinol — buy when ready', tip:'Apply LAST. Lowest strength. 2-3 nights/week max.', future:true },
+  { id:'p1', emoji:'🧴', name:'Senka Perfect Whip (blue)',     tip:'Remove the day. Massage gently, rinse well.' },
+  { id:'p6', emoji:'🔮', name:'Retinol Face Mask (gold pack)', tip:'Apply mask sheet to face. Leave 15-20 min then remove. Pat in the remaining essence — do not rinse off. No other serums tonight.' },
+  { id:'p5', emoji:'🌿', name:'SANA Soy Milk Eye Cream',       tip:'Tiny amount around eyes after mask. Pat with ring finger.' },
 ]
 const PM_EXFOLIANT = [
-  { id:'p1', emoji:'🧴', name:'Senka Perfect Whip Cleanser',       tip:'Remove the day. Massage gently, rinse well.' },
-  { id:'p7', emoji:'🍋', name:'Lactic Acid 10% — buy when ready',  tip:'Apply to dry skin. Leave 10 min then rinse. Skip all serums tonight.', future:true },
-  { id:'p8', emoji:'🫧', name:'Rich Moisturiser — buy when ready', tip:'Apply after lactic acid. No serums needed tonight.', future:true },
+  { id:'p1', emoji:'🧴', name:'Senka Perfect Whip (blue)',         tip:'Remove the day. Massage gently, rinse well.' },
+  { id:'p9', emoji:'🖤', name:'Jonetz 100 Sheet Mask',             tip:'Apply to clean face. Leave 15-20 min then remove. Pat in remaining essence gently. Then continue with serums below.' },
+  { id:'p2', emoji:'✨', name:'Matrixyl 10% + HA Peptide',         tip:'After mask essence absorbed. Few drops, pat gently.' },
+  { id:'p3', emoji:'💧', name:'Niacinamide 10% + Zinc',            tip:'Few drops full face after peptide.' },
+  { id:'p4', emoji:'👁️', name:'Caffeine Solution 5%',              tip:'Dab gently around eye area only.' },
+  { id:'p5', emoji:'🌿', name:'SANA Soy Milk Eye Cream',           tip:'Tiny amount around eyes. Pat with ring finger.' },
+  { id:'p7', emoji:'🍋', name:'Lactic Acid 10% — buy when ready', tip:'Future: will replace Jonetz mask on Saturdays. Apply to dry skin, leave 10 min, rinse. Skip serums that night.', future:true },
 ]
 
 function getDayType(dow) { if(dow===6) return 'exfoliant'; if(dow===2||dow===4) return 'retinol'; return 'normal' }
 function getPM(dow) { const t=getDayType(dow); return t==='retinol'?PM_RETINOL:t==='exfoliant'?PM_EXFOLIANT:PM_NORMAL }
 
 const TYPE = {
-  normal:   { label:'Full Routine Day',        icon:'🌿', color:C.green,  bg:'#E8F4EB' },
-  retinol:  { label:'Future Retinol Night',    icon:'🔮', color:C.purple, bg:'#EDE8F5' },
-  exfoliant:{ label:'Future Exfoliant Night',  icon:'🍋', color:C.amber,  bg:'#FDF3E7' },
+  normal:   { label:'Full Routine Day',    icon:'🌿', color:C.green,   bg:'#E8F4EB' },
+  retinol:  { label:'Retinol Mask Night',  icon:'🔮', color:C.purple,  bg:'#EDE8F5' },
+  exfoliant:{ label:'Sheet Mask Saturday', icon:'🖤', color:'#2A2A2A', bg:'#EFEFEF' },
 }
 const WARN = {
-  retinol:  { color:C.purple, bg:'#EDE8F5', text:'Tue & Thu are your future retinol nights. Until you buy retinol, follow the normal evening routine below.' },
-  exfoliant:{ color:C.amber,  bg:'#FDF3E7', text:'Saturday is your future exfoliant night. Until you buy lactic acid, follow the normal evening routine below.' },
+  retinol:  { color:C.purple,  bg:'#EDE8F5', text:'Retinol mask night! Cleanse, apply gold retinol mask 15-20 min, pat in the remaining essence, finish with eye cream. No other serums tonight.' },
+  exfoliant:{ color:'#2A2A2A', bg:'#EFEFEF', text:'Sheet mask Saturday! Apply Jonetz mask after cleansing, pat in essence, then follow with your normal serums. Lactic acid will replace this when you buy it.' },
 }
-
-const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December']
-const DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
-const RATINGS = [{v:1,e:'😔',l:'Poor'},{v:2,e:'😐',l:'Okay'},{v:3,e:'🙂',l:'Good'},{v:4,e:'😊',l:'Great'}]
 
 // ── HELPERS ──────────────────────────────────────────────────
 function todayStr() { return fmtD(new Date()) }
@@ -462,8 +463,9 @@ function ProgressTab({ logs, photos }) {
   const recent = logArr.filter(([,l])=>l.rating).sort(([a],[b])=>a.localeCompare(b)).slice(-14)
   const notes  = logArr.filter(([,l])=>l.note).sort(([a],[b])=>b.localeCompare(a)).slice(0,5)
   const allProds = [...AM,...PM_NORMAL,
-    {id:'f1',emoji:'🔮',name:'Retinol',tip:'Buy when ready — Tue & Thu nights'},
-    {id:'f2',emoji:'🍋',name:'Lactic Acid 10%',tip:'Buy when ready — Saturday nights'},
+    {id:'f1',emoji:'🔮',name:'Retinol Face Mask (gold pack)',tip:'Tue & Thu nights — 15-20 min, pat in essence, skip other serums'},
+    {id:'f2',emoji:'🖤',name:'Jonetz 100 Sheet Mask',tip:'Saturday nights — 15-20 min, pat in essence, then continue with serums'},
+    {id:'f3',emoji:'🍋',name:'Lactic Acid 10%',tip:'Buy when ready — will replace sheet mask on Saturdays'},
   ]
 
   return (
@@ -515,8 +517,8 @@ function ProgressTab({ logs, photos }) {
         <div style={{fontSize:14,fontWeight:700,marginBottom:12}}>Weekly Schedule</div>
         {[
           {days:'Mon, Wed, Fri, Sun', icon:'🌿', label:'Full routine',               color:C.green,  bg:'#E8F4EB'},
-          {days:'Tue, Thu',           icon:'🔮', label:'Normal now — retinol later', color:C.purple, bg:'#EDE8F5'},
-          {days:'Saturday',           icon:'🍋', label:'Normal now — exfoliant later',color:C.amber,  bg:'#FDF3E7'},
+          {days:'Tue, Thu',  icon:'🔮', label:'Retinol face mask night',   color:C.purple, bg:'#EDE8F5'},
+          {days:'Saturday', icon:'🖤', label:'Sheet mask + normal serums',  color:'#333',   bg:'#F0F0F0'},
         ].map(r=>(
           <div key={r.days} style={{display:'flex',alignItems:'center',gap:10,padding:'10px 0',borderBottom:`1px solid ${C.light}`}}>
             <span style={{fontSize:22}}>{r.icon}</span>
