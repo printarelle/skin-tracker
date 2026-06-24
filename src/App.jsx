@@ -50,6 +50,10 @@ const WARN = {
   exfoliant:{ color:'#2A2A2A', bg:'#EFEFEF', text:'Sheet mask Saturday! Apply Jonetz mask after cleansing, pat in essence, then follow with your normal serums. Lactic acid will replace this when you buy it.' },
 }
 
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December']
+const DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+const RATINGS = [{v:1,e:'😔',l:'Poor'},{v:2,e:'😐',l:'Okay'},{v:3,e:'🙂',l:'Good'},{v:4,e:'😊',l:'Great'}]
+
 // ── HELPERS ──────────────────────────────────────────────────
 function todayStr() { return fmtD(new Date()) }
 function fmtD(dt)   { return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0') }
