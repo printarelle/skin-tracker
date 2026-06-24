@@ -274,6 +274,326 @@ function PhotosTab({ photos, setPhotos }) {
 
   function handleFile(e) {
     const f = e.target.files?.[0]; if(!f) return
+    const reader = new FileReader()
+    reader.onload = ev => {
+      const img = new Image()
+      img.onload = () => {
+        // Compress and resize to max 800px wide, quality 0.7
+        const canvas = document.createElement('canvas')
+        const maxW = 800
+        const scale = img.width > maxW ? maxW / img.width : 1
+        canvas.width  = img.width  * scale
+        canvas.height = img.height * scale
+        const ctx = canvas.getContext('2d')
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+        const compressed = canvas.toDataURL('image/jpeg', 0.7)
+        setPending(compressed)
+        setPreview(compressed)
+      }
+      img.src = ev.target.result
+    }
+    reader.readAsDataURL(f)
+    e.target.value = ''
+  }
+
+  function savePhoto() {
+    if(!pending) { showToast('Please choose a photo first'); return }
+    const newPhotos = [{data:pending, date:todayStr(), note}, ...photos]
+    try {
+      localStorage.setItem('skinPhotos', JSON.stringify(newPhotos))
+      setPhotos(newPhotos)
+      setPending(null); setPreview(null); setNote('')
+      showToast('Photo saved!')
+    } catch(err) {
+      showToast('Storage full! Delete some old photos first')
+    }
+  }
+
+  function deletePhoto(i) {
+    if(!window.confirm('Delete this photo?')) return
+    setPhotos(p => p.filter((_,j)=>j!==i))
+    showToast('Deleted')
+  }
+
+  return (
+    <div style={{padding:16}}>
+      <div style={{fontSize:20,fontWeight:700,marginBottom:4}}>Progress Photos</div>
+      <div style={{fontSize:13,color:C.mid,marginBottom:16}}>Weekly photos to track your skin journey</div>
+
+      <Card>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:12}}>
+          <button onClick={()=>galleryRef.current?.click()} style={{background:C.light,border:`2px dashed ${C.blush}`,borderRadius:12,padding:'16px 8px',cursor:'pointer',fontFamily:'inherit',color:C.deep,fontSize:13,fontWeight:600,display:'flex',flexDirection:'column',alignItems:'center',gap:6}}>
+            <span style={{fontSize:28}}>🖼️</span>From Gallery
+          </button>
+          <button onClick={()=>cameraRef.current?.click()} style={{background:C.light,border:`2px dashed ${C.blush}`,borderRadius:12,padding:'16px 8px',cursor:'pointer',fontFamily:'inherit',color:C.deep,fontSize:13,fontWeight:600,display:'flex',flexDirection:'column',alignItems:'center',gap:6}}>
+            <span style={{fontSize:28}}>📷</span>Take Photo
+          </button>
+        </div>
+        <input ref={galleryRef} type='file' accept='image/*' onChange={handleFile} style={{display:'none'}}/>
+        <input ref={cameraRef}  type='file' accept='image/*' capture='environment' onChange={handleFile} style={{display:'none'}}/>
+
+        {preview && (
+          <div style={{marginBottom:12,borderRadius:10,overflow:'hidden',position:'relative'}}>
+            <img src={preview} alt='Preview' style={{width:'100%',maxHeight:200,objectFit:'cover',display:'block'}}/>
+            <button onClick={()=>{setPreview(null);setPending(null)}} style={{position:'absolute',top:8,right:8,width:28,height:28,borderRadius:'50%',background:'rgba(0,0,0,0.55)',border:'none',color:'white',cursor:'pointer',fontSize:16,display:'flex',alignItems:'center',justifyContent:'center'}}>×</button>
+          </div>
+        )}
+
+        <textarea value={note} onChange={e=>setNote(e.target.value)} placeholder='Add a note e.g. Week 1, before starting...' rows={2}
+          style={{width:'100%',border:`1px solid ${C.light}`,borderRadius:10,padding:'10px 12px',fontFamily:'inherit',fontSize:13,color:C.deep,background:C.white,resize:'none',outline:'none',marginBottom:10}}/>
+        <button onClick={savePhoto} style={{background:C.rose,color:'white',border:'none',borderRadius:12,padding:14,fontFamily:'inherit',fontSize:14,fontWeight:700,cursor:'pointer',width:'100%'}}>
+          Save Photo
+        </button>
+      </Card>
+
+      {photos.length===0 ? (
+        <div style={{textAlign:'center',padding:'30px 20px',color:C.mid}}>
+          <div style={{fontSize:42,marginBottom:10}}>🖼️</div>
+          <p style={{fontSize:13}}>No photos yet.<br/>Upload your first weekly photo above!</p>
+        </div>
+      ) : (
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
+          {photos.map((p,i)=>(
+            <div key={i} style={{borderRadius:12,overflow:'hidden',aspectRatio:'1',position:'relative',backgrou  { id:'p7', emoji:'🍋', name:'Lactic Acid 10% — buy when ready', tip:'Future: will replace Jonetz mask on Saturdays. Apply to dry skin, leave 10 min, rinse. Skip serums that night.', future:true },
+]
+
+function getDayType(dow) { if(dow===6) return 'exfoliant'; if(dow===2||dow===4) return 'retinol'; return 'normal' }
+function getPM(dow) { const t=getDayType(dow); return t==='retinol'?PM_RETINOL:t==='exfoliant'?PM_EXFOLIANT:PM_NORMAL }
+
+const TYPE = {
+  normal:   { label:'Full Routine Day',    icon:'🌿', color:C.green,   bg:'#E8F4EB' },
+  retinol:  { label:'Retinol Mask Night',  icon:'🔮', color:C.purple,  bg:'#EDE8F5' },
+  exfoliant:{ label:'Sheet Mask Saturday', icon:'🖤', color:'#2A2A2A', bg:'#EFEFEF' },
+}
+const WARN = {
+  retinol:  { color:C.purple,  bg:'#EDE8F5', text:'Retinol mask night! Cleanse, apply gold retinol mask 15-20 min, pat in the remaining essence, finish with eye cream. No other serums tonight.' },
+  exfoliant:{ color:'#2A2A2A', bg:'#EFEFEF', text:'Sheet mask Saturday! Apply Jonetz mask after cleansing, pat in essence, then follow with your normal serums. Lactic acid will replace this when you buy it.' },
+}
+
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December']
+const DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+const RATINGS = [{v:1,e:'😔',l:'Poor'},{v:2,e:'😐',l:'Okay'},{v:3,e:'🙂',l:'Good'},{v:4,e:'😊',l:'Great'}]
+
+// ── HELPERS ──────────────────────────────────────────────────
+function todayStr() { return fmtD(new Date()) }
+function fmtD(dt)   { return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0') }
+function parseD(s)  { const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d) }
+function dispD(s)   { return parseD(s).toLocaleDateString('en-IE',{day:'numeric',month:'short',year:'numeric'}) }
+function shortD(s)  { return parseD(s).toLocaleDateString('en-IE',{day:'numeric',month:'short'}) }
+
+function useStorage(key, def) {
+  const [val, setVal] = useState(() => {
+    try { const s = localStorage.getItem(key); return s ? JSON.parse(s) : def } catch { return def }
+  })
+  const set = useCallback(v => {
+    const nv = typeof v === 'function' ? v(val) : v
+    setVal(nv)
+    try { localStorage.setItem(key, JSON.stringify(nv)) } catch {}
+  }, [key, val])
+  return [val, set]
+}
+
+// ── SHARED UI ────────────────────────────────────────────────
+function Toast({ msg }) {
+  return msg ? (
+    <div style={{position:'fixed',bottom:80,left:'50%',transform:'translateX(-50%)',background:C.deep,color:C.cream,padding:'9px 20px',borderRadius:99,fontSize:12,zIndex:999,whiteSpace:'nowrap',boxShadow:'0 4px 16px rgba(0,0,0,0.25)'}}>
+      {msg}
+    </div>
+  ) : null
+}
+
+function Card({ children, style={} }) {
+  return <div style={{background:C.card,borderRadius:14,padding:16,marginBottom:12,border:`1px solid ${C.light}`,...style}}>{children}</div>
+}
+
+function ProgBar({ done, total }) {
+  const pct = total ? Math.round(done/total*100) : 0
+  return (
+    <div style={{height:4,background:C.light,borderRadius:99,overflow:'hidden',marginTop:10}}>
+      <div style={{height:'100%',width:pct+'%',background:`linear-gradient(90deg,${C.blush},${C.rose})`,borderRadius:99,transition:'width 0.3s'}}/>
+    </div>
+  )
+}
+
+function Step({ s, num, checked, onToggle }) {
+  return (
+    <div style={{display:'flex',alignItems:'flex-start',gap:10,padding:'11px 0',borderBottom:`1px solid ${C.light}`,opacity:s.future?0.4:1}}>
+      <button
+        onClick={s.future ? undefined : onToggle}
+        disabled={!!s.future}
+        style={{width:28,height:28,borderRadius:'50%',border:'none',background:checked?C.rose:C.light,color:checked?'white':C.mid,fontSize:12,fontWeight:700,flexShrink:0,cursor:s.future?'default':'pointer',marginTop:1,fontFamily:'inherit',transition:'all 0.15s'}}>
+        {checked ? '✓' : num}
+      </button>
+      <div style={{flex:1}}>
+        <div style={{fontSize:14,fontWeight:600}}>
+          {s.name}
+          {s.future && <span style={{fontSize:9,background:'#eee',color:'#999',padding:'1px 7px',borderRadius:99,marginLeft:6,verticalAlign:'middle'}}>not yet</span>}
+        </div>
+        <div style={{fontSize:12,color:C.mid,marginTop:3,lineHeight:1.5}}>{s.tip}</div>
+      </div>
+      <div style={{fontSize:22,flexShrink:0}}>{s.emoji}</div>
+    </div>
+  )
+}
+
+// ── GUIDE TAB ────────────────────────────────────────────────
+function GuideTab({ logs, setLogs }) {
+  const now = new Date()
+  const [calY, setCalY] = useState(now.getFullYear())
+  const [calM, setCalM] = useState(now.getMonth())
+  const [sel, setSel]   = useState(todayStr())
+  const [rating, setRating] = useState(0)
+  const [note, setNote]     = useState('')
+  const [toast, setToast]   = useState('')
+
+  const showToast = m => { setToast(m); setTimeout(() => setToast(''), 2000) }
+
+  useEffect(() => {
+    const l = logs[sel] || {}
+    setRating(l.rating || 0)
+    setNote(l.note || '')
+  }, [sel, logs])
+
+  function changeMonth(d) {
+    let m = calM+d, y = calY
+    if(m>11){m=0;y++;} if(m<0){m=11;y--;}
+    setCalM(m); setCalY(y)
+  }
+
+  function toggleStep(session, id) {
+    setLogs(prev => {
+      const n = {...prev, [sel]: {...(prev[sel]||{})}}
+      n[sel][session] = {...(n[sel][session]||{})}
+      n[sel][session][id] = !n[sel][session][id]
+      return n
+    })
+  }
+
+  function saveLog() {
+    setLogs(prev => ({...prev, [sel]: {...(prev[sel]||{}), rating, note, dayType: getDayType(parseD(sel).getDay())}}))
+    showToast('Saved ✓')
+  }
+
+  // Calendar cells
+  const first   = new Date(calY, calM, 1).getDay()
+  const dim     = new Date(calY, calM+1, 0).getDate()
+  const prevDim = new Date(calY, calM, 0).getDate()
+  const today   = todayStr()
+  const cells   = []
+  for(let i=first-1;i>=0;i--) cells.push({day:prevDim-i, ds:fmtD(new Date(calY,calM-1,prevDim-i)), other:true})
+  for(let d=1;d<=dim;d++)     cells.push({day:d, ds:fmtD(new Date(calY,calM,d)), other:false})
+  const rem = (first+dim)%7===0 ? 0 : 7-(first+dim)%7
+  for(let d=1;d<=rem;d++)     cells.push({day:d, ds:fmtD(new Date(calY,calM+1,d)), other:true})
+
+  function dotColor(ds) {
+    const l = logs[ds]; if(!l) return null
+    const dow = parseD(ds).getDay()
+    const pmA = getPM(dow).filter(s=>!s.future)
+    const amDone = AM.filter(s=>l.am?.[s.id]).length
+    const pmDone = pmA.filter(s=>l.pm?.[s.id]).length
+    return amDone===AM.length && pmDone===pmA.length ? C.green : C.amber
+  }
+
+  const dt      = parseD(sel)
+  const dow     = dt.getDay()
+  const dayType = getDayType(dow)
+  const info    = TYPE[dayType]
+  const warn    = WARN[dayType]
+  const log     = logs[sel] || {}
+  const pmSteps = getPM(dow)
+  const pmActive= pmSteps.filter(s=>!s.future)
+  const amDone  = AM.filter(s=>log.am?.[s.id]).length
+  const pmDone  = pmActive.filter(s=>log.pm?.[s.id]).length
+
+  return (
+    <div>
+      {/* Calendar */}
+      <div style={{background:C.white,padding:'14px 14px 10px',borderBottom:`1px solid ${C.light}`}}>
+        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:10}}>
+          <button onClick={()=>changeMonth(-1)} style={{background:C.light,border:'none',borderRadius:8,width:34,height:34,fontSize:22,cursor:'pointer',color:C.deep,display:'flex',alignItems:'center',justifyContent:'center'}}>‹</button>
+          <span style={{fontSize:17,fontWeight:700}}>{MONTHS[calM]} {calY}</span>
+          <button onClick={()=>changeMonth(1)}  style={{background:C.light,border:'none',borderRadius:8,width:34,height:34,fontSize:22,cursor:'pointer',color:C.deep,display:'flex',alignItems:'center',justifyContent:'center'}}>›</button>
+        </div>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:2,marginBottom:4}}>
+          {DAYS.map(d=><div key={d} style={{textAlign:'center',fontSize:10,color:C.mid,fontWeight:600,padding:'3px 0'}}>{d}</div>)}
+        </div>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:3}}>
+          {cells.map((c,i) => {
+            const dot  = dotColor(c.ds)
+            const isSel= c.ds===sel
+            const isTod= c.ds===today
+            return (
+              <button key={i} onClick={()=>setSel(c.ds)} style={{aspectRatio:'1',borderRadius:9,border:`2px solid ${isSel?C.rose:isTod?C.rose:'transparent'}`,background:isSel?C.rose:'none',color:isSel?'white':c.other?'#ccc':isTod?C.rose:C.deep,fontSize:13,fontWeight:isTod||isSel?700:500,cursor:'pointer',position:'relative',fontFamily:'inherit',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                {c.day}
+                {dot && <span style={{position:'absolute',bottom:2,left:'50%',transform:'translateX(-50%)',width:4,height:4,borderRadius:'50%',background:isSel?'rgba(255,255,255,0.8)':dot}}/>}
+              </button>
+            )
+          })}
+        </div>
+        <div style={{display:'flex',gap:16,marginTop:10,justifyContent:'center'}}>
+          <span style={{fontSize:10,color:C.mid,display:'flex',alignItems:'center',gap:4}}><span style={{width:8,height:8,borderRadius:'50%',background:C.green,display:'inline-block'}}/> All done</span>
+          <span style={{fontSize:10,color:C.mid,display:'flex',alignItems:'center',gap:4}}><span style={{width:8,height:8,borderRadius:'50%',background:C.amber,display:'inline-block'}}/> Partial</span>
+        </div>
+      </div>
+
+      {/* Day Panel */}
+      <div style={{padding:16}}>
+        <div style={{fontSize:19,fontWeight:700,marginBottom:8}}>{dt.toLocaleDateString('en-IE',{weekday:'long',day:'numeric',month:'long'})}</div>
+        <span style={{display:'inline-flex',alignItems:'center',gap:5,padding:'5px 14px',borderRadius:99,fontSize:11,fontWeight:600,background:info.bg,color:info.color,marginBottom:12}}>{info.icon} {info.label}</span>
+        {warn && <div style={{background:warn.bg,borderLeft:`3px solid ${warn.color}`,borderRadius:10,padding:'10px 12px',marginBottom:12,fontSize:12,color:warn.color,lineHeight:1.5}}>{warn.text}</div>}
+
+        <Card>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
+            <span style={{fontSize:14,fontWeight:700}}>🌅 Morning</span>
+            <span style={{fontSize:12,color:C.mid}}>{amDone}/{AM.length} done</span>
+          </div>
+          {AM.map((s,i)=><Step key={s.id} s={s} num={i+1} checked={!!log.am?.[s.id]} onToggle={()=>toggleStep('am',s.id)}/>)}
+          <ProgBar done={amDone} total={AM.length}/>
+        </Card>
+
+        <Card>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
+            <span style={{fontSize:14,fontWeight:700}}>🌙 Evening</span>
+            <span style={{fontSize:12,color:C.mid}}>{pmDone}/{pmActive.length} done</span>
+          </div>
+          {pmSteps.map((s,i)=><Step key={s.id} s={s} num={i+1} checked={!!log.pm?.[s.id]} onToggle={()=>toggleStep('pm',s.id)}/>)}
+          <ProgBar done={pmDone} total={pmActive.length}/>
+        </Card>
+
+        <Card>
+          <div style={{fontSize:14,fontWeight:700,marginBottom:10}}>How did your skin feel today?</div>
+          <div style={{display:'flex',gap:6}}>
+            {RATINGS.map(r=>(
+              <button key={r.v} onClick={()=>setRating(r.v)} style={{flex:1,padding:'10px 4px',border:`2px solid ${rating===r.v?C.rose:C.light}`,borderRadius:10,background:rating===r.v?C.light:C.white,fontSize:12,color:rating===r.v?C.deep:C.mid,cursor:'pointer',fontFamily:'inherit',fontWeight:rating===r.v?700:400,transition:'all 0.15s'}}>
+                <span style={{fontSize:20,display:'block',marginBottom:2}}>{r.e}</span>{r.l}
+              </button>
+            ))}
+          </div>
+          <textarea value={note} onChange={e=>setNote(e.target.value)} placeholder='Any notes about your skin today...' rows={2}
+            style={{width:'100%',border:`1px solid ${C.light}`,borderRadius:10,padding:'10px 12px',fontFamily:'inherit',fontSize:13,color:C.deep,background:C.white,marginTop:10,resize:'none',outline:'none'}}/>
+          <button onClick={saveLog} style={{background:C.rose,color:'white',border:'none',borderRadius:12,padding:14,fontFamily:'inherit',fontSize:14,fontWeight:700,cursor:'pointer',width:'100%',marginTop:10}}>
+            Save Day
+          </button>
+        </Card>
+      </div>
+      <Toast msg={toast}/>
+    </div>
+  )
+}
+
+// ── PHOTOS TAB ───────────────────────────────────────────────
+function PhotosTab({ photos, setPhotos }) {
+  const [note, setNote]       = useState('')
+  const [preview, setPreview] = useState(null)
+  const [pending, setPending] = useState(null)
+  const [toast, setToast]     = useState('')
+  const galleryRef = useRef()
+  const cameraRef  = useRef()
+
+  const showToast = m => { setToast(m); setTimeout(()=>setToast(''), 2200) }
+
+  function handleFile(e) {
+    const f = e.target.files?.[0]; if(!f) return
     const r = new FileReader()
     r.onload = ev => { setPending(ev.target.result); setPreview(ev.target.result) }
     r.readAsDataURL(f)
