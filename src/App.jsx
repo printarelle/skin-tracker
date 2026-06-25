@@ -42,11 +42,11 @@ function getPM(dow) { const t=getDayType(dow); return t==='retinol'?PM_RETINOL:t
 
 const TYPE = {
   normal:   { label:'Full Routine Day',    icon:'🌿', color:C.green,   bg:'#E8F4EB' },
-  retinol:  { label:'Retinol Mask Night',  icon:'🔮', color:C.purple,  bg:'#EDE8F5' },
+  retinol:  { label:'Retinol Night',        icon:'🔮', color:C.purple,  bg:'#EDE8F5' },
   exfoliant:{ label:'Lactic Acid Saturday', icon:'🍋', color:'#8B6020', bg:'#FDF3E7' },
 }
 const WARN = {
-  retinol:  { color:C.purple,  bg:'#EDE8F5', text:'Retinol mask night! Cleanse, apply gold retinol mask 15-20 min, pat in the remaining essence, finish with eye cream. No other serums tonight.' },
+  retinol:  { color:C.purple,  bg:'#EDE8F5', text:'Retinol night! Cleanse, wait 20 min, apply The Ordinary Retinol 0.5% to dry skin, finish with eye cream. No Vitamin C or other actives tonight.' },
   exfoliant:{ color:'#8B6020', bg:'#FDF3E7', text:'Lactic acid night! Cleanse, pat completely dry, apply lactic acid for exactly 10 min then rinse off. Then apply your normal serums. Start with this once a week only.' },
 }
 
@@ -318,17 +318,15 @@ function ProgressTab({ logs }) {
   const recent = logArr.filter(([,l])=>l.rating).sort(([a],[b])=>a.localeCompare(b)).slice(-14)
   const notes  = logArr.filter(([,l])=>l.note).sort(([a],[b])=>b.localeCompare(a)).slice(0,5)
   const allProds = [...AM,...PM_NORMAL,
-    {id:'f1',emoji:'🔮',name:'The Ordinary Retinol 0.5%',tip:'Tue & Thu evenings — start once a week, build slowly to twice'},
-    {id:'f2',emoji:'🍋',name:'The Ordinary Lactic Acid 10%',tip:'Saturday evenings — dry skin, 10 min, rinse, then serums as normal'},
-    {id:'f9',emoji:'🖤',name:'Jonetz 100 Sheet Mask',tip:'Use occasionally on any evening instead of lactic acid for extra hydration boost'},
-    {id:'f3',emoji:'🍋',name:'Lactic Acid 10%',tip:'Buy when ready — will replace sheet mask on Saturdays'},
+    {id:'f1',emoji:'🔮',name:'The Ordinary Retinol 0.5%',tip:'Tue & Thu evenings — once a week to start, build to twice. Apply last on dry skin.'},
+    {id:'f2',emoji:'🍋',name:'The Ordinary Lactic Acid 10%',tip:'Saturday evenings only — dry skin, exactly 10 min, rinse off, then serums as normal.'},
+    {id:'f9',emoji:'🖤',name:'Jonetz 100 Sheet Mask',tip:'Use any evening for an extra hydration boost instead of lactic acid or serums.'},
+    {id:'fa',emoji:'🔬',name:'Rosvanee Retinol 2.5%',tip:'Put aside until skin is fully tolerant of 0.5% retinol — at least 6 months of consistent use first.'},
+    {id:'fb',emoji:'☀️',name:'L'Oreal Revitalift SPF30',tip:'Every morning without fail — last step after all serums.'},
     {id:'f4',emoji:'🧪',name:'Rosvanee Retinol 2.5%',tip:'Put aside for now — too strong until your skin builds tolerance over 3-6 months'},
   ]
 
   return (
     <div style={{padding:16}}>
       <div style={{fontSize:20,fontWeight:700,marginBottom:4}}>My Progress</div>
-      <div style={{fontSize:13,color:C.mid,marginBottom:16}}>Your skin journey overview</div>
-
-      <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:8,marginBottom:12}}>
-        {[{n:daysLogged,l:'Days logged',
+      <div style=
