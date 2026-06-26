@@ -313,4 +313,97 @@ function ProgressTab({ logs }) {
       <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:12}}>
         {[{n:daysLogged,l:'Days logged',e:'📅'},{n:streak,l:'Day streak',e:'🔥'}].map(s=>(
           <Card key={s.l} style={{marginBottom:0,textAlign:'center',padding:'14px 8px'}}>
-            <div style={{fontSize:24,marginBottom:4}}>{s.e
+            <div style={{fontSize:24,marginBottom:4}}>{s.e}</div>
+            <div style={{fontSize:28,fontWeight:700,color:C.rose,lineHeight:1}}>{s.n}</div>
+            <div style={{fontSize:10,color:C.mid,marginTop:4}}>{s.l}</div>
+          </Card>
+        ))}
+      </div>
+
+      <Card>
+        <div style={{fontSize:14,fontWeight:700,marginBottom:12}}>Skin Feeling Over Time</div>
+        {recent.length===0 ? (
+          <div style={{textAlign:'center',padding:'12px 0',color:C.mid,fontSize:12}}>Rate your skin daily to see trends here</div>
+        ) : (
+          <>
+            <div style={{display:'flex',alignItems:'flex-end',gap:4,height:72}}>
+              {recent.map(([ds,l])=>(
+                <div key={ds} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:2}}>
+                  <div style={{width:'100%',background:C.rose,borderRadius:'3px 3px 0 0',height:(l.rating/4*60)+'px',opacity:0.8}}/>
+                  <span style={{fontSize:8,color:C.mid,transform:'rotate(-45deg)',whiteSpace:'nowrap',marginTop:2}}>{shortD(ds).split(' ')[0]}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{display:'flex',justifyContent:'space-between',fontSize:9,color:C.mid,marginTop:20}}><span>Poor</span><span>Great</span></div>
+          </>
+        )}
+      </Card>
+
+      <Card>
+        <div style={{fontSize:14,fontWeight:700,marginBottom:10}}>Recent Notes</div>
+        {notes.length===0 ? <div style={{fontSize:12,color:C.mid}}>No notes yet</div>
+        : notes.map(([ds,l])=>(
+          <div key={ds} style={{padding:'8px 0',borderBottom:`1px solid ${C.light}`}}>
+            <div style={{fontSize:11,color:C.rose,fontWeight:700,marginBottom:3}}>{dispD(ds)}</div>
+            <div style={{fontSize:12,color:C.mid,fontStyle:'italic'}}>"{l.note}"</div>
+          </div>
+        ))}
+      </Card>
+
+      <Card>
+        <div style={{fontSize:14,fontWeight:700,marginBottom:12}}>Weekly Schedule</div>
+        {schedule.map(r=>(
+          <div key={r.days} style={{display:'flex',alignItems:'center',gap:10,padding:'10px 0',borderBottom:`1px solid ${C.light}`}}>
+            <span style={{fontSize:22}}>{r.icon}</span>
+            <div>
+              <div style={{fontSize:13,fontWeight:600}}>{r.days}</div>
+              <span style={{fontSize:10,background:r.bg,color:r.color,padding:'2px 8px',borderRadius:99,fontWeight:600}}>{r.label}</span>
+            </div>
+          </div>
+        ))}
+      </Card>
+
+      <Card>
+        <div style={{fontSize:14,fontWeight:700,marginBottom:10}}>All Products</div>
+        {allProds.map(p=>(
+          <div key={p.id} style={{display:'flex',alignItems:'center',gap:10,padding:'9px 0',borderBottom:`1px solid ${C.light}`}}>
+            <span style={{fontSize:20}}>{p.emoji}</span>
+            <div>
+              <div style={{fontSize:13,fontWeight:600}}>{p.name}</div>
+              <div style={{fontSize:11,color:C.mid}}>{p.tip}</div>
+            </div>
+          </div>
+        ))}
+      </Card>
+    </div>
+  )
+}
+
+export default function App() {
+  const [tab,  setTab]  = useState('guide')
+  const [logs, setLogs] = useStorage('skinLogs', {})
+  const tabs = [
+    {id:'guide',   icon:'📅', label:'Guide'},
+    {id:'log',     icon:'📋', label:'Log'},
+    {id:'progress',icon:'📊', label:'Progress'},
+  ]
+
+  return (
+    <div style={{background:C.cream,minHeight:'100vh',paddingBottom:68,fontFamily:"'DM Sans',sans-serif",maxWidth:500,margin:'0 auto'}}>
+      <div style={{background:C.deep,color:C.cream,padding:'16px 20px 12px',position:'sticky',top:0,zIndex:100}}>
+        <h1 style={{fontSize:20,fontWeight:700}}>Skin Tracker</h1>
+        <p style={{fontSize:11,color:C.blush,marginTop:2}}>{tab==='guide' ? 'Tap a day and follow the steps' : 'Your skincare journey'}</p>
+      </div>
+      {tab==='guide'    && <GuideTab    logs={logs} setLogs={setLogs}/>}
+      {tab==='log'      && <LogTab      logs={logs}/>}
+      {tab==='progress' && <ProgressTab logs={logs}/>}
+      <nav style={{position:'fixed',bottom:0,left:0,right:0,background:C.white,borderTop:`1px solid ${C.light}`,display:'flex',zIndex:100,maxWidth:500,margin:'0 auto'}}>
+        {tabs.map(t=>(
+          <button key={t.id} onClick={()=>setTab(t.id)} style={{flex:1,padding:'10px 4px 8px',border:'none',background:'none',fontFamily:'inherit',fontSize:10,fontWeight:600,color:tab===t.id?C.rose:C.mid,cursor:'pointer',display:'flex',flexDirection:'column',alignItems:'center',gap:3,borderTop:`2px solid ${tab===t.id?C.rose:'transparent'}`,transition:'color 0.15s'}}>
+            <span style={{fontSize:22}}>{t.icon}</span>{t.label}
+          </button>
+        ))}
+      </nav>
+    </div>
+  )
+}
